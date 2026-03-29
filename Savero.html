@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuchamadRafiSaveroPro</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0c10;
+            --card-glass: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent: #e2b74a;
+            --accent-glow: rgba(226, 183, 74, 0.4);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            cursor: pointer;
+        }
+
+        /* Particles Background */
+        #particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, #15181e 0%, #0a0c10 100%);
+        }
+        .dot { position: absolute; background: #fff; border-radius: 50%; opacity: 0.1; animation: float linear infinite; }
+        @keyframes float { from { transform: translateY(100vh); } to { transform: translateY(-10vh); } }
+
+        /* Marquee Header */
+        .header-marquee {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(10, 12, 16, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 0;
+        }
+        .marquee-track { display: flex; white-space: nowrap; animation: scroll 15s linear infinite; }
+        .marquee-item { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--accent); padding: 0 30px; text-transform: uppercase; opacity: 0.8; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Layout Container */
+        .wrapper {
+            max-width: 440px; margin: 0 auto; padding: 100px 24px 80px;
+            min-height: 100vh; display: flex; flex-direction: column;
+            position: relative; z-index: 1;
+        }
+
+        /* Profile Section */
+        .profile { margin-bottom: 40px; text-align: center; }
+        .pfp-container {
+            width: 110px; height: 110px; margin: 0 auto 20px;
+            position: relative; padding: 6px;
+            border-radius: 50%; background: linear-gradient(135deg, var(--accent), transparent);
+        }
+        .pfp-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #111; }
+        .profile h1 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .profile .badge { color: var(--accent); font-size: 0.9rem; margin-left: 4px; }
+        .profile p { color: var(--text-secondary); font-size: 0.85rem; font-weight: 400; }
+
+        /* Secondary Nav Buttons */
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .nav-btn {
+            background: var(--card-glass); border: 1px solid var(--card-border);
+            padding: 16px; border-radius: 20px; color: #fff; cursor: pointer;
+            transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .nav-btn i { color: var(--accent); font-size: 1.2rem; }
+        .nav-btn span { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-btn:hover { background: var(--card-border); border-color: var(--accent); transform: translateY(-4px); }
+
+        /* Link Stack & Standard Cards */
+        .links-stack { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+        .card {
+            background: var(--card-glass); border: 1px solid var(--card-border);
+            padding: 18px 24px; border-radius: 22px; text-decoration: none;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: var(--transition); position: relative; overflow: hidden;
+            height: 65px;
+        }
+        .card span { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
+        .card i.entypo { color: var(--text-secondary); font-size: 1rem; transition: var(--transition); }
+        
+        .card:not(.partner-ad):hover { border-color: var(--accent); background: rgba(226, 183, 74, 0.03); transform: translateX(6px); }
+        .card:not(.partner-ad):hover i.entypo { color: var(--accent); transform: translateX(4px); }
+
+        /* Partner Ad Model */
+        .card.partner-ad { 
+            background: linear-gradient(135deg, #1a1e26 0%, #0d1014 100%);
+            border: 2px solid var(--accent);
+            padding: 12px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 10px var(--accent-glow);
+            animation: border-pulsate 2s infinite;
+            display: flex; align-items: center; gap: 15px;
+            justify-content: flex-start;
+        }
+        
+        @keyframes border-pulsate {
+            0% { border-color: rgba(226, 183, 74, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 10px var(--accent-glow); }
+            50% { border-color: rgba(226, 183, 74, 0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 5px rgba(226, 183, 74, 0.1); }
+            100% { border-color: rgba(226, 183, 74, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 10px var(--accent-glow); }
+        }
+
+        .ad-icon-wrap {
+            width: 42px; height: 42px; background: #000;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--accent); position: relative;
+        }
+        .ad-icon-wrap i { color: var(--accent); font-size: 1.2rem; }
+        
+        .ad-body { flex: 1; text-align: left; }
+        .ad-body small { color: var(--text-secondary); font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .ad-body b { 
+            display: block; font-size: 0.95rem; color: #fff; margin-top: 1px;
+            background: linear-gradient(90deg, #fff, var(--accent), #fff);
+            -webkit-background-clip: text; background-clip: text;
+            background-size: 200% auto; animation: text-shine 3s linear infinite;
+        }
+
+        @keyframes text-shine { to { background-position: 200% center; } }
+        
+        .card.partner-ad::before {
+            content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: ad-shine-sweep 3.5s infinite;
+        }
+        @keyframes ad-shine-sweep { 0% { left: -150%; } 30% { left: 150%; } 100% { left: 150%; } }
+
+        .card.partner-ad:hover { transform: scale(1.02); }
+
+        /* Subpages */
+        .subpage { display: none; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .back-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--card-border); background: none; color: #fff; cursor: pointer; }
+        .section-title { font-size: 1.2rem; font-weight: 800; color: var(--accent); text-transform: uppercase; }
+
+        /* Benefits Grid */
+        .grid-8 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .b-card {
+            background: var(--card-glass); border: 1px solid var(--card-border);
+            padding: 20px; border-radius: 20px; text-align: left;
+        }
+        .b-icon { width: 36px; height: 36px; background: rgba(226, 183, 74, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .b-icon i { color: var(--accent); font-size: 0.9rem; }
+        .b-card h4 { font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; }
+        .b-card p { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; }
+
+        /* Testimonials */
+        .testi-scroll { max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 6px; }
+        .t-card { background: var(--card-glass); border: 1px solid var(--card-border); padding: 20px; border-radius: 22px; }
+        .t-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .t-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1a1e26; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: var(--accent); border: 1px solid var(--card-border); }
+        .t-user { font-size: 0.8rem; font-weight: 700; }
+        .t-stars { color: #fbbf24; font-size: 0.65rem; letter-spacing: 2px; }
+        .t-text { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; }
+
+        /* Payment Info */
+        .pay-info { background: var(--card-glass); border: 1px solid var(--card-border); border-radius: 25px; padding: 20px; margin-bottom: 40px; text-align: center; }
+        .pay-title { font-size: 0.6rem; letter-spacing: 2.5px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 15px; font-weight: 700; }
+        .pay-row { display: flex; justify-content: center; gap: 15px; }
+        .pay-tag { background: #fff; color: #000; padding: 4px 12px; border-radius: 8px; font-weight: 900; font-size: 0.7rem; display: flex; align-items: center; gap: 5px; }
+        .pay-tag.qris { background: #fff; } .pay-tag.qris img { height: 12px; }
+
+        /* Social Icons */
+        .socials { display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; }
+        .social-link { width: 50px; height: 50px; border-radius: 16px; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; transition: var(--transition); }
+        .social-link:hover { border-color: var(--accent); background: var(--accent); color: #000; transform: translateY(-5px); }
+
+        footer { text-align: center; font-size: 0.65rem; color: var(--text-secondary); letter-spacing: 4px; text-transform: uppercase; opacity: 0.5; margin-top: auto; }
+
+        .hidden { display: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+    </style>
+</head>
+<body onmousedown="fireworkEffect(event)" ontouchstart="fireworkEffect(event)">
+
+    <div id="particles"></div>
+
+    <div class="header-marquee">
+        <div class="marquee-track">
+            <div class="marquee-item">Luxury Web Development</div>
+            <div class="marquee-item">Joki eFootball</div>
+            <div class="marquee-item">Market eFootball</div>
+            <div class="marquee-item">Trusted Service</div>
+            <div class="marquee-item">Luxury Web Development</div>
+            <div class="marquee-item">Joki eFootball</div>
+            <div class="marquee-item">Market eFootball</div>
+            <div class="marquee-item">Trusted Service</div>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        
+        <section id="main-sec">
+            <div class="profile">
+                <div class="pfp-container">
+                    <img src="SVRO.jpg" alt="SVRO">
+                </div>
+                <h1>@MuchamadRafiSavero <i class="fas fa-check-circle badge"></i></h1>
+                <p>Digital Tech & Strategic Solutions Partner</p>
+            </div>
+
+            <nav class="nav-grid">
+                <div class="nav-btn" onclick="showPage('benefit-sec')">
+                    <i class="fas fa-crown"></i>
+                    <span>Benefit</span>
+                </div>
+                <div class="nav-btn" onclick="showPage('testi-sec')">
+                    <i class="fas fa-star"></i>
+                    <span>Testimoni</span>
+                </div>
+            </nav>
+
+            <div class="links-stack">
+                <a href="https://wa.me/6289651167331?text=Halo%20MuchamadRafiSavero,%20saya%20tertarik%20dengan%20jasa%20Luxury%20Web%20Development.%20Mohon%20infonya!" class="card partner-ad">
+                    <div class="ad-icon-wrap">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div class="ad-body">
+                        <small>Official Partner</small>
+                        <b>Luxury Web Development</b>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="color:var(--accent); font-size: 0.7rem; opacity: 0.7;"></i>
+                </a>
+
+                <a href="https://chat.whatsapp.com/E83RHwS4YqF5KlkdRNsrbW" class="card">
+                    <span>Mabar eFootball</span>
+                    <i class="fa-solid fa-trophy entypo"></i>
+                </a>
+
+                <div class="card" style="cursor:pointer" onclick="showPage('joki-sec')">
+                    <span>Joki eFootball</span>
+                    <i class="fa-solid fa-gamepad entypo"></i>
+                </div>
+
+                <a href="https://chat.whatsapp.com/JVwENtKOtG8Cmpm0UJzirC" class="card">
+                    <span>Marketplace eFootball</span>
+                    <i class="fa-solid fa-store entypo"></i>
+                </a>
+
+                <a href="https://sociabuzz.com/cemilandivisi/tribe" class="card">
+                    <span>Support via Sociabuzz</span>
+                    <i class="fa-solid fa-hand-holding-dollar entypo"></i>
+                </a>
+
+                <a href="https://saweria.co/MuchamadRafiSavero" class="card">
+                    <span>Support via Saweria</span>
+                    <i class="fa-solid fa-money-bill-wave entypo"></i>
+                </a>
+            </div>
+
+            <div class="socials">
+                <a href="https://wa.me/6283123819723" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.instagram.com/saveropesmob?igsh=OG41NGRvN20xY25r" class="social-link"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@streamerpes?_r=1&_t=ZS-955XZ8GEp64" class="social-link"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.facebook.com/share/18BmEg5EW7/" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            </div>
+
+            <div class="pay-info">
+                <div class="pay-title">Authorized Payment</div>
+                <div class="pay-row">
+                    <div class="pay-tag qris"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"></div>
+                    <div class="pay-tag"><i class="fas fa-university"></i> BANK</div>
+                    <div class="pay-tag"><i class="fas fa-wallet"></i> WALLET</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="joki-sec" class="subpage">
+            <div class="section-header">
+                <button class="back-btn" onclick="showPage('main-sec')"><i class="fas fa-chevron-left"></i></button>
+                <h2 class="section-title">Pilih Paket</h2>
+            </div>
+            <div class="links-stack">
+                <div class="card" onclick="order('Paket Racik & Susun', '50K')"><span>Paket Racik & Susun</span> <b>50K</b></div>
+                <div class="card" onclick="order('Divisi 2 - 1', '60K')"><span>Divisi 2 - 1</span> <b>60K</b></div>
+                <div class="card" onclick="order('Divisi 3 - 1', '70K')"><span>Divisi 3 - 1</span> <b>70K</b></div>
+                <div class="card" onclick="order('Divisi 6 s.d 10 - 1', '100K')"><span>Divisi 6 s.d 10 - 1</span> <b>100K</b></div>
+                <div class="card" onclick="order('Rating 1800-1900', '150K')"><span>Rating 1800-1900</span> <b>150K</b></div>
+                <div class="card" onclick="order('Rating 2000+', 'NEGO')"><span>Rating 2000+</span> <b>NEGO</b></div>
+            </div>
+        </section>
+
+        <section id="benefit-sec" class="subpage">
+            <div class="section-header">
+                <button class="back-btn" onclick="showPage('main-sec')"><i class="fas fa-chevron-left"></i></button>
+                <h2 class="section-title">Keunggulan</h2>
+            </div>
+            <div class="grid-8">
+                <div class="b-card"><div class="b-icon"><i class="fa-solid fa-shield-alt"></i></div><h4>Garansi Aman</h4><p>Enkripsi data & perlindungan akun 100%.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-bolt"></i></div><h4>Proses Kilat</h4><p>Hasil instan tanpa menunggu lama.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-headset"></i></div><h4>Priority 24/7</h4><p>Admin responsif kapanpun Anda butuh.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-tags"></i></div><h4>Best Price</h4><p>Harga termurah dengan kualitas bintang 5.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-gem"></i></div><h4>Quality Dev</h4><p>Standard pengerjaan tingkat profesional.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-star"></i></div><h4>Verified</h4><p>Sudah terbukti oleh ribuan pelanggan.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-gift"></i></div><h4>Loyalty Bonus</h4><p>Bonus saldo & diskon untuk langganan.</p></div>
+                <div class="b-card"><div class="b-icon"><i class="fas fa-handshake"></i></div><h4>Official</h4><p>Solusi digital legal & terpercaya.</p></div>
+            </div>
+        </section>
+
+        <section id="testi-sec" class="subpage">
+            <div class="section-header">
+                <button class="back-btn" onclick="showPage('main-sec')"><i class="fas fa-chevron-left"></i></button>
+                <h2 class="section-title">Testimoni</h2>
+            </div>
+            <div id="testi-container" class="testi-scroll"></div>
+        </section>
+
+        <footer>© 2026 MUCHAMAD RAFISAVERO</footer>
+    </div>
+
+    <script>
+        function initDots() {
+            const container = document.getElementById('particles');
+            for(let i=0; i<60; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                const size = Math.random() * 3;
+                dot.style.width = size + 'px'; dot.style.height = size + 'px';
+                dot.style.left = Math.random() * 100 + 'vw';
+                dot.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                dot.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(dot);
+            }
+        }
+
+        function fireworkEffect(e) {
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+            if (!x || !y) return;
+            confetti({ 
+                origin: { x: x / window.innerWidth, y: y / window.innerHeight },
+                colors: ['#e2b74a', '#ffffff'], spread: 360, particleCount: 15, gravity: 1.2, decay: 0.94, startVelocity: 15, scalar: 0.7 
+            });
+        }
+
+        function showPage(id) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            window.scrollTo(0,0);
+            if(id === 'testi-sec') loadTesti();
+            confetti({ particleCount: 40, spread: 70, origin: { y: 0.7 }, colors: ['#e2b74a', '#ffffff'] });
+        }
+
+        // FUNGSI ORDER DENGAN FORMAT PESAN BARU
+        function order(pkg, price) {
+            const phoneNumber = "6283123819723";
+            const message = `Halo MuchamadRafiSavero, saya ingin memesan jasa Joki Ranking:
+
+📌 Paket: ${pkg}
+💰 Harga: ${price}
+
+Mohon dipandu proses pembayarannya admin!`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`);
+        }
+
+        function loadTesti() {
+            const container = document.getElementById('testi-container');
+            const users = ["Rizky", "Andi", "Budi", "Dewi", "Sultan", "Kevin", "Fajar", "Lutfi"];
+            const text = ["Gak nyesel order di sini!", "Proses gila cepet banget.", "Web jadinya mewah parah.", "Aman banget akun saya.", "Adminnya baik & fast respon."];
+            let html = "";
+            for(let i=1; i<=100; i++) {
+                const u = users[Math.floor(Math.random() * users.length)];
+                const t = text[Math.floor(Math.random() * text.length)];
+                html += `<div class="t-card"><div class="t-header"><div class="t-avatar">${u[0]}</div><div><div class="t-user">${u} #${i}</div><div class="t-stars">★★★★★</div></div></div><p class="t-text">"${t}"</p></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        window.onload = initDots;
+    </script>
+</body>
+</html>
